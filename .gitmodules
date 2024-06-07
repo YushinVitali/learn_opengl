@@ -7,3 +7,8 @@
 	path = googletest
 	url = https://github.com/google/googletest.git
 	branch = main
+
+[submodule "glew"]
+	path = glew-cmake
+	url = https://github.com/Perlmint/glew-cmake.git
+	branch = master

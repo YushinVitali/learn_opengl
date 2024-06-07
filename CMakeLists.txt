@@ -68,11 +68,36 @@ if (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     endif ()
 endif ()
 
+message(STATUS "Linking GLFW...")
 set(GLFW_LIB_DIR    ${CMAKE_CURRENT_SOURCE_DIR}/glfw)
 add_subdirectory(${GLFW_LIB_DIR})
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw)
 
+message(STATUS "Linking GLEW...")
+set(GLEW_LIB_DIR    ${CMAKE_CURRENT_SOURCE_DIR}/glew-cmake)
+add_subdirectory(${GLEW_LIB_DIR})
+target_link_libraries(${PROJECT_NAME} PUBLIC libglew_static)
+
+message(STATUS "Linking OpenGL...")
+find_package(OpenGL REQUIRED)
+#target_include_directories(${OPENGL_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${OPENGL_LIBRARIES})
+
+message(STATUS "Linking GoogleTests...")
 set(GOOGLTEST_LIB_DIR   ${CMAKE_CURRENT_SOURCE_DIR}/googletest)
 add_subdirectory(${GOOGLTEST_LIB_DIR})
 #target_link_libraries(${PROJECT_NAME} PUBLIC gtest gtest-main)
 target_link_libraries(${PROJECT_NAME} PUBLIC gtest)
+
+
+
+# message(STATUS "Looking for GLFW")
+# FetchContent_Declare(
+#        GLFW
+#         GIT_REPOSITORY https://github.com/glfw/glfw
+# )
+# set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "Build the GLFW example programs")
+# set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "Build the GLFW test programs")
+# set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "Build the GLFW documentation")
+# set(GLFW_INSTALL OFF CACHE INTERNAL "Generate installation target")
+# FetchContent_MakeAvailable(GLFW)
