@@ -57,8 +57,7 @@ int main() {
 	GLint success;
 	GLchar infoLog[512];
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
@@ -68,8 +67,7 @@ int main() {
 	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
 	glCompileShader(fragmentShader);
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
 	}
@@ -81,8 +79,7 @@ int main() {
 	glLinkProgram(shaderProgram);
 	// Check for linking errors
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
 		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
 	}
@@ -90,14 +87,26 @@ int main() {
 	glDeleteShader(fragmentShader);
 
 	GLfloat vertices[]{
-		-0.5f, -0.5f, 0.0f,	 //
+		0.5f,  0.5f,  0.0f,	 //
 		0.5f,  -0.5f, 0.0f,	 //
-		0.0f,  0.5f,  0.0f	 //
+		-0.5f, -0.5f, 0.0f,	 //
+		-0.5f, 0.5f,  0.0f,	 //
 	};
 
+	GLuint indices[] = {
+		0, 1, 3,  //
+		1, 2, 3	  //
+	};
+
+	// Element Buffer Object (EBO) or Index Buffer Object (IBO)
+	GLuint EBO;
+	glGenBuffers(1, &EBO);
+
+	// Vertex Array Object (VAO)
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
 
+	// Vertex Buffer Object (VBO)
 	GLuint VBO;
 	glGenBuffers(1, &VBO);
 
@@ -105,13 +114,21 @@ int main() {
 	glBindVertexArray(VAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// To copy buffer data
+	// - GL_STATIC_DRAW: data that will never or very rarely be changed;
+	// - GL_DYNAMIC_DRAW: if data changes frequently;
+	// - GL_STREAM_DRAW: if data changed every frame.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	// How OpenGL can interpret vertex data (vertices)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
 	// Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound
-	//	Vertex Buffer Object so afterwards we can safely unbind
+	//	Vertex Buffer Object so afterward we can safely unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs)
@@ -119,7 +136,8 @@ int main() {
 
 	// Game loop
 	while (!glfwWindowShouldClose(window)) {
-		// Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response  functions
+		// Check if any events have been activated (key pressed, mouse moved etc.) and call corresponding response
+		// functions
 		glfwPollEvents();
 
 		// Render
@@ -129,7 +147,7 @@ int main() {
 		// Draw our first triangle
 		glUseProgram(shaderProgram);
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		glfwSwapBuffers(window);
@@ -138,6 +156,7 @@ int main() {
 	// Properly de-allocate all resources once they have outlived their purpose
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 
 	glfwTerminate();
 	return 0;

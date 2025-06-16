@@ -1,5 +1,5 @@
 # Change minimum version for CPP modules
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.0)
 
 project(learn_opengl VERSION 0.1.0 LANGUAGES CXX)
 
